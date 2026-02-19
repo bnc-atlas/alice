@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import type { ContentWithDetails, Folder, Tag } from '@/lib/supabase'
+import type { ContentWithDetails, Folder, Tag, ContentStatus } from '@/lib/supabase'
 import { X, Save, ExternalLink } from 'lucide-react'
 import { updateContentItem, removeTagFromContent, supabase } from '@/lib/supabase'
 
@@ -174,7 +174,7 @@ export default function EditContentDialog({
             <label className="block text-sm font-medium mb-2">Status</label>
             <select
               value={status}
-              onChange={(e) => setStatus(e.target.value as any)}
+              onChange={(e) => setStatus(e.target.value as ContentStatus)}
               className="input w-full"
             >
               <option value="to_read">To Read</option>

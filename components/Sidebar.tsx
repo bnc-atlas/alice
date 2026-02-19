@@ -1,18 +1,16 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { type Folder, type Tag, createFolder, createTag, deleteFolder, deleteTag, updateFolder, updateTag } from '@/lib/supabase'
 import { 
   Folder as FolderIcon,
   Tag as TagIcon,
   Plus,
   Settings,
-  Clock,
   X,
   ChevronDown,
   ChevronRight,
   Edit2,
-  Trash2,
   GripVertical,
   Palette
 } from 'lucide-react'

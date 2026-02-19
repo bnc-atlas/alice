@@ -64,7 +64,7 @@ function StatCard({
   value, 
   gradient 
 }: { 
-  icon: any
+  icon: React.ComponentType<{ className?: string }>
   label: string
   value: number
   gradient: string

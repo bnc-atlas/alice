@@ -2,30 +2,38 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
-import type { ContentWithDetails } from '@/lib/supabase'
-import {
-  ExternalLink,
-  MoreVertical,
-  Edit,
-  Trash2,
-  CheckCircle2,
-  Circle,
-  Clock,
-  Archive,
-  BookOpen,
-  Video,
-  Headphones,
+import { 
+  ExternalLink, 
+  Star, 
+  MoreHorizontal, 
+  Trash2, 
+  Edit3, 
+  Eye, 
+  Share2,
+  X,
+  ChevronDown,
+  ChevronUp,
   FileText,
+  Video,
+  Image,
+  Headphones,
+  FolderOpen,
+  MoreVertical,
+  BookOpen,
   Bookmark,
+  Circle,
+  CheckCircle2,
+  Archive,
+  Edit
 } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { formatDistanceToNow } from 'date-fns'
 import { deleteContentItem } from '@/lib/supabase'
-import { supabase } from '@/lib/supabase'
+import { supabase, ContentWithDetails } from '@/lib/supabase'
 
 interface ContentCardProps {
   content: ContentWithDetails
-  viewMode: 'grid' | 'list' // Dashboard always passes "list" now
+  viewMode: 'grid' | 'list'
   style?: React.CSSProperties
   onUpdate: () => void
   onOpenDetails?: (item: ContentWithDetails) => void
@@ -93,22 +101,6 @@ export default function ContentCard({
       onUpdate()
     } catch (error) {
       console.error('Error deleting content:', error)
-    }
-  }
-
-  const getTypeIcon = () => {
-    const iconClass = 'w-5 h-5'
-    switch (content.content_type) {
-      case 'article':
-        return <FileText className={iconClass} />
-      case 'video':
-        return <Video className={iconClass} />
-      case 'book':
-        return <BookOpen className={iconClass} />
-      case 'podcast':
-        return <Headphones className={iconClass} />
-      default:
-        return <Bookmark className={iconClass} />
     }
   }
 
@@ -237,7 +229,7 @@ export default function ContentCard({
         {/* Tags */}
         {content.tag_names && content.tag_names.length > 0 && (
           <div className="flex flex-wrap gap-2 mt-3">
-            {content.tag_names.slice(0, 4).map((tag, i) => (
+            {content.tag_names.slice(0, 4).map((tag: string, i: number) => (
               <span key={i} className="tag-chip">
                 #{tag}
               </span>

@@ -11,8 +11,7 @@ import {
   ChevronDown,
   ChevronRight,
   Edit2,
-  GripVertical,
-  Palette
+  GripVertical
 } from 'lucide-react'
 import { motion, AnimatePresence, Reorder } from 'framer-motion'
 

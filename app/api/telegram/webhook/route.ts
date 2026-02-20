@@ -21,7 +21,13 @@ const pendingMessages = new Map<string, {
 }>()
 
 // Process a complete message set (URL + tags/folders)
-async function processCompleteMessageSet(chatId: string, urlMessage: any, tagsMessage: any) {
+async function processCompleteMessageSet(chatId: string, urlMessage: {
+  text?: string
+  message_id: number
+}, tagsMessage: {
+  text?: string
+  message_id: number
+}) {
   try {
     const telegramUserUUID = '00000000-0000-0000-0000-000000000000'
     

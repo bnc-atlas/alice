@@ -20,7 +20,6 @@ import AddContentDialog from '@/components/AddContentDialog'
 import EditContentDialog from '@/components/EditContentDialog'
 import Sidebar from '@/components/Sidebar'
 
-type ViewMode = 'grid' | 'list'
 type FilterStatus = 'all' | 'to_read' | 'completed' | 'archived'
 
 export default function Dashboard() {
@@ -28,9 +27,6 @@ export default function Dashboard() {
   const [folders, setFolders] = useState<Folder[]>([])
   const [tags, setTags] = useState<Tag[]>([])
   const [loading, setLoading] = useState(true)
-  
-  // Force list view only
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('list')
   
   // Remove grid/list toggle buttons
   // Remove view mode state and toggle functionality
@@ -141,25 +137,6 @@ export default function Dashboard() {
     return true
   })
 
-  const getContentTypeIcon = (type: string) => {
-    switch (type) {
-      case 'article': return FileText
-      case 'video': return Video
-      case 'book': return BookOpen
-      case 'podcast': return Headphones
-      default: return Bookmark
-    }
-  }
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'to_read': return Circle
-      case 'completed': return CheckCircle2
-      case 'archived': return Archive
-      default: return Circle
-    }
-  }
-
   return (
     <div className="flex min-h-screen bg-background">
       {/* Sidebar */}
@@ -253,10 +230,8 @@ export default function Dashboard() {
                 <ContentCard
                   key={item.id}
                   content={item}
-                  viewMode="list"
                   style={{ animationDelay: `${index * 50}ms` }}
                   onUpdate={fetchData}
-                  onOpenDetails={setSelectedItem}
                   onEdit={setEditingItem}
                 />
               ))}

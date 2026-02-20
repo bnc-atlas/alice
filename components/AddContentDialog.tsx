@@ -154,7 +154,7 @@ export default function AddContentDialog({ folders, tags, onClose, onSuccess }: 
                     />
                   </div>
                   <p className="text-xs text-muted-foreground mt-2">
-                    We'll automatically fetch the title, description, and thumbnail
+                    We&apos;ll automatically fetch the title, description, and thumbnail
                   </p>
                 </div>
 

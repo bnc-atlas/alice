@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { 
   ExternalLink, 
-  MoreHorizontal, 
   Trash2, 
   MoreVertical,
   Circle,
@@ -19,19 +18,15 @@ import { supabase, ContentWithDetails } from '@/lib/supabase'
 
 interface ContentCardProps {
   content: ContentWithDetails
-  viewMode: 'grid' | 'list'
   style?: React.CSSProperties
   onUpdate: () => void
-  onOpenDetails?: (item: ContentWithDetails) => void
   onEdit?: (item: ContentWithDetails) => void
 }
 
 export default function ContentCard({
   content,
-  viewMode,
   style,
   onUpdate,
-  onOpenDetails,
   onEdit,
 }: ContentCardProps) {
   const [showMenu, setShowMenu] = useState(false)

@@ -12,7 +12,10 @@ const ALLOWED_CHAT_IDS = process.env.TELEGRAM_ALLOWED_CHAT_IDS?.split(',') || []
 // Store pending messages waiting for their counterpart
 const pendingMessages = new Map<string, { 
   type: 'url' | 'tags'; 
-  data: any; 
+  data: {
+    text?: string
+    message_id: number
+  }; 
   timestamp: number; 
   chatId: string 
 }>()
@@ -23,13 +26,13 @@ async function processCompleteMessageSet(chatId: string, urlMessage: any, tagsMe
     const telegramUserUUID = '00000000-0000-0000-0000-000000000000'
     
     // Parse URL message
-    const urlParts = urlMessage.text.split(' ')
+    const urlParts = urlMessage.text?.split(' ') || []
     const url = urlParts[0]
     const urlTags = urlParts.filter((p: string) => p.startsWith('#')).map((p: string) => p.slice(1))
     const urlFolder = urlParts.find((p: string) => p.startsWith('@'))?.slice(1)
     
     // Parse tags message
-    const tagsParts = tagsMessage.text.split(' ')
+    const tagsParts = tagsMessage.text?.split(' ') || []
     const tags = tagsParts.filter((p: string) => p.startsWith('#')).map((p: string) => p.slice(1))
     const folder = tagsParts.find((p: string) => p.startsWith('@'))?.slice(1)
     
@@ -176,9 +179,12 @@ async function processCompleteMessageSet(chatId: string, urlMessage: any, tagsMe
 }
 
 // Process a URL message that arrives without tags (after timeout)
-async function processStandaloneUrlMessage(chatId: string, message: any) {
+async function processStandaloneUrlMessage(chatId: string, message: {
+  text?: string
+  message_id: number
+}) {
   try {
-    const text = message.text
+    const text = message.text || ''
     const parts = text.split(' ')
     const url = parts[0]
     const tags = parts.filter((p: string) => p.startsWith('#')).map((p: string) => p.slice(1))
@@ -323,7 +329,10 @@ async function processStandaloneUrlMessage(chatId: string, message: any) {
 }
 
 // Check for pending counterpart and process if found
-function checkAndProcessPending(chatId: string, currentMessage: any, currentType: 'url' | 'tags') {
+async function checkAndProcessPending(chatId: string, currentMessage: {
+  text?: string
+  message_id: number
+}, currentType: 'url' | 'tags') {
   const pendingKey = `${chatId}_${currentType === 'url' ? 'tags' : 'url'}`
   const pending = pendingMessages.get(pendingKey)
   
@@ -332,9 +341,9 @@ function checkAndProcessPending(chatId: string, currentMessage: any, currentType
     pendingMessages.delete(pendingKey)
     
     if (currentType === 'url') {
-      processCompleteMessageSet(chatId, currentMessage, pending.data)
+      await processCompleteMessageSet(chatId, currentMessage, pending.data)
     } else {
-      processCompleteMessageSet(chatId, pending.data, currentMessage)
+      await processCompleteMessageSet(chatId, pending.data, currentMessage)
     }
     return true
   }
@@ -388,7 +397,7 @@ https://article.com #coding @curriculum
       )
     } else if (text.startsWith('http')) {
       // URL message - check for pending tags or store for later
-      if (checkAndProcessPending(chatId, message, 'url')) {
+      if (await checkAndProcessPending(chatId, message, 'url')) {
         return NextResponse.json({ ok: true })
       }
       
@@ -416,7 +425,7 @@ https://article.com #coding @curriculum
       
     } else if (text.includes('#') || text.includes('@')) {
       // Tags/folders message - check for pending URL or store for later
-      if (checkAndProcessPending(chatId, message, 'tags')) {
+      if (await checkAndProcessPending(chatId, message, 'tags')) {
         return NextResponse.json({ ok: true })
       }
       

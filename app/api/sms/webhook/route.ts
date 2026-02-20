@@ -73,7 +73,7 @@ Reply "help" anytime for this guide!`)
     }
 
     // Create content item
-    let metadata: any = {}
+    let metadata: Record<string, unknown> = {}
     
     if (parsed.url) {
       // Fetch metadata from URL
@@ -213,7 +213,16 @@ function parseMessage(body: string): {
   command?: string
   author?: string
 } {
-  const result: any = {
+  const result: {
+    tags: string[]
+    url?: string
+    title?: string
+    description?: string
+    folder?: string
+    author?: string
+    command?: string
+    contentType?: string
+  } = {
     tags: [],
   }
 
@@ -280,26 +289,6 @@ function detectContentType(url: string): string {
     return 'book'
   }
   return 'article'
-}
-
-function getRandomColor(): string {
-  const colors = [
-    '#6366f1', // Indigo
-    '#8b5cf6', // Violet
-    '#ec4899', // Pink
-    '#f59e0b', // Amber
-    '#10b981', // Emerald
-    '#06b6d4', // Cyan
-    '#ef4444', // Red
-    '#f97316', // Orange
-    '#84cc16', // Lime
-    '#14b8a6', // Teal
-    '#3b82f6', // Blue
-    '#a855f7', // Purple
-    '#f43f5e', // Rose
-    '#eab308', // Yellow
-  ]
-  return colors[Math.floor(Math.random() * colors.length)]
 }
 
 // Get a unique color for new tags/folders based on name hash

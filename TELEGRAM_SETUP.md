@@ -463,6 +463,17 @@ stats - Statistics
 
 ---
 
+## 🎯 Quick Reference
+
+| What you type | What happens |
+|---------------|--------------|
+| `URL` | Saves with auto-detected metadata |
+| `URL #tag` | Adds tag (creates if new) |
+| `URL @folder` | Adds to folder (creates if new) |
+| `URL #tag @folder` | Adds tag AND folder |
+| `#multi-word-tag` | Creates hyphenated tag as "multi word tag" |
+| `@"multi word"` | Creates multi-word folder |
+
 ## 💡 Pro Tips
 
 1. **Pin your bot** to top of Telegram for quick access

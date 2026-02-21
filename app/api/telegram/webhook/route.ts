@@ -37,14 +37,16 @@ async function processCompleteMessageSet(chatId: string, urlMessage: {
     const urlTags = urlParts.filter((p: string) => p.startsWith('#')).map((p: string) => p.slice(1))
     const urlFolder = urlParts.find((p: string) => p.startsWith('@'))?.slice(1)
     const urlDescriptionIndex = urlParts.findIndex((p: string) => p.startsWith('*'))
-    const urlDescription = urlDescriptionIndex !== -1 ? urlParts.slice(urlDescriptionIndex + 1).join(' ') : ''
+    const urlDescription = urlDescriptionIndex !== -1 ? 
+      urlParts.slice(urlDescriptionIndex).join(' ').replace(/^\*/, '') : ''
     
     // Parse tags message
     const tagsParts = tagsMessage.text?.split(' ') || []
     const tags = tagsParts.filter((p: string) => p.startsWith('#')).map((p: string) => p.slice(1))
     const folder = tagsParts.find((p: string) => p.startsWith('@'))?.slice(1)
     const descriptionIndex = tagsParts.findIndex((p: string) => p.startsWith('*'))
-    const description = descriptionIndex !== -1 ? tagsParts.slice(descriptionIndex + 1).join(' ') : ''
+    const description = descriptionIndex !== -1 ? 
+      tagsParts.slice(descriptionIndex).join(' ').replace(/^\*/, '') : ''
     
     // Combine tags and folders from both messages
     const allTags = [...new Set([...urlTags, ...tags])]
@@ -52,6 +54,10 @@ async function processCompleteMessageSet(chatId: string, urlMessage: {
     const finalDescription = description || urlDescription
     
     console.log('Processing complete set:', { url, allTags, finalFolder, finalDescription })
+    console.log('Raw URL message:', urlMessage.text)
+    console.log('Raw tags message:', tagsMessage.text)
+    console.log('URL parts:', urlParts)
+    console.log('Tags parts:', tagsParts)
 
     // Fetch actual title from URL
     let title = 'New Content'
@@ -202,7 +208,8 @@ async function processStandaloneUrlMessage(chatId: string, message: {
     const tags = parts.filter((p: string) => p.startsWith('#')).map((p: string) => p.slice(1))
     const folder = parts.find((p: string) => p.startsWith('@'))?.slice(1)
     const descriptionIndex = parts.findIndex((p: string) => p.startsWith('*'))
-    const finalDescription = descriptionIndex !== -1 ? parts.slice(descriptionIndex + 1).join(' ') : ''
+    const finalDescription = descriptionIndex !== -1 ? 
+      parts.slice(descriptionIndex).join(' ').replace(/^\*/, '') : ''
 
     const telegramUserUUID = '00000000-0000-0000-0000-000000000000'
 

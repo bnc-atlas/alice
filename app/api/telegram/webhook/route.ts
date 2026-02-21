@@ -36,15 +36,15 @@ async function processCompleteMessageSet(chatId: string, urlMessage: {
     const url = urlParts[0]
     const urlTags = urlParts.filter((p: string) => p.startsWith('#')).map((p: string) => p.slice(1))
     const urlFolder = urlParts.find((p: string) => p.startsWith('@'))?.slice(1)
-    const urlDescriptionParts = urlParts.filter((p: string) => p.startsWith('*')).map((p: string) => p.slice(1))
-    const urlDescription = urlDescriptionParts.join(' ')
+    const urlDescriptionIndex = urlParts.findIndex((p: string) => p.startsWith('*'))
+    const urlDescription = urlDescriptionIndex !== -1 ? urlParts.slice(urlDescriptionIndex + 1).join(' ') : ''
     
     // Parse tags message
     const tagsParts = tagsMessage.text?.split(' ') || []
     const tags = tagsParts.filter((p: string) => p.startsWith('#')).map((p: string) => p.slice(1))
     const folder = tagsParts.find((p: string) => p.startsWith('@'))?.slice(1)
-    const descriptionParts = tagsParts.filter((p: string) => p.startsWith('*')).map((p: string) => p.slice(1))
-    const description = descriptionParts.join(' ')
+    const descriptionIndex = tagsParts.findIndex((p: string) => p.startsWith('*'))
+    const description = descriptionIndex !== -1 ? tagsParts.slice(descriptionIndex + 1).join(' ') : ''
     
     // Combine tags and folders from both messages
     const allTags = [...new Set([...urlTags, ...tags])]
@@ -143,7 +143,6 @@ async function processCompleteMessageSet(chatId: string, urlMessage: {
         user_id: telegramUserUUID,
         title,
         url,
-        description: finalDescription,
         content_type: 'article',
         status: 'to_read',
         progress_percentage: 0,
@@ -201,8 +200,8 @@ async function processStandaloneUrlMessage(chatId: string, message: {
     const url = parts[0]
     const tags = parts.filter((p: string) => p.startsWith('#')).map((p: string) => p.slice(1))
     const folder = parts.find((p: string) => p.startsWith('@'))?.slice(1)
-    const descriptionParts = parts.filter((p: string) => p.startsWith('*')).map((p: string) => p.slice(1))
-    const finalDescription = descriptionParts.join(' ')
+    const descriptionIndex = parts.findIndex((p: string) => p.startsWith('*'))
+    const finalDescription = descriptionIndex !== -1 ? parts.slice(descriptionIndex + 1).join(' ') : ''
 
     const telegramUserUUID = '00000000-0000-0000-0000-000000000000'
 
@@ -296,7 +295,6 @@ async function processStandaloneUrlMessage(chatId: string, message: {
         user_id: telegramUserUUID,
         title,
         url,
-        description: finalDescription,
         content_type: 'article',
         status: 'to_read',
         progress_percentage: 0,
@@ -402,17 +400,8 @@ export async function POST(request: Request) {
       await sendTelegramMessage(chatId,
 `🧠 Welcome to Second Brain!
 
-Send me URLs with tags, folders, and descriptions:
-https://article.com #coding @curriculum *Great article about React hooks
-
-📝 Syntax:
-• #tag - Add tags
-• @folder - Add to folder
-• *description - Add description
-
-Examples:
-• https://article.com #ai #ml @research *Latest ML research
-• https://video.com #tutorial @learning *Great React course
+Send me any URL with tags and folders:
+https://article.com #coding @curriculum
 
 📊 Commands:
 /stats - Your statistics
@@ -468,7 +457,7 @@ Examples:
         if (pending && (Date.now() - pending.timestamp >= 15000)) {
           console.log('Timeout: no URL found for tags message')
           pendingMessages.delete(`${chatId}_tags`)
-          sendTelegramMessage(chatId, '❓ I could not find a recent URL from you. Please send the article link first, then your #tags/@folder/*description.')
+          sendTelegramMessage(chatId, '❓ I could not find a recent URL from you. Please send the article link first, then your #tags/@folder.')
         }
       }, 15000)
       

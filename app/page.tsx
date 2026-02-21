@@ -6,6 +6,8 @@ import { formatDistanceToNow } from 'date-fns'
 import { 
   Plus, 
   Search, 
+  Menu,
+  X,
   BookOpen,
   Video,
   Headphones,
@@ -27,16 +29,14 @@ export default function Dashboard() {
   const [folders, setFolders] = useState<Folder[]>([])
   const [tags, setTags] = useState<Tag[]>([])
   const [loading, setLoading] = useState(true)
-  
-  // Remove grid/list toggle buttons
-  // Remove view mode state and toggle functionality
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedFolder, setSelectedFolder] = useState<string | null>(null)
-  const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [statusFilter, setStatusFilter] = useState<FilterStatus>('all')
   const [showAddDialog, setShowAddDialog] = useState(false)
-  const [selectedItem, setSelectedItem] = useState<ContentWithDetails | null>(null)
   const [editingItem, setEditingItem] = useState<ContentWithDetails | null>(null)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [selectedFolder, setSelectedFolder] = useState<string | null>(null)
+  const [selectedTags, setSelectedTags] = useState<string[]>([])
+  const [selectedItem, setSelectedItem] = useState<ContentWithDetails | null>(null)
 
   useEffect(() => {
     fetchData()
@@ -140,21 +140,25 @@ export default function Dashboard() {
   return (
     <div className="flex min-h-screen bg-background">
       {/* Sidebar */}
-      <Sidebar 
-        folders={folders}
-        tags={tags}
-        selectedFolder={selectedFolder}
-        selectedTags={selectedTags}
-        onFolderSelect={setSelectedFolder}
-        onTagsSelect={setSelectedTags}
-        onRefresh={fetchData}
-      />
-
+      <div className={`transition-all duration-300 ease-in-out relative ${sidebarCollapsed ? 'w-10' : 'w-72'}`}>
+        <Sidebar 
+          folders={folders}
+          tags={tags}
+          selectedFolder={selectedFolder}
+          selectedTags={selectedTags}
+          onFolderSelect={setSelectedFolder}
+          onTagsSelect={setSelectedTags}
+          onRefresh={fetchData}
+          collapsed={sidebarCollapsed}
+          onCollapse={setSidebarCollapsed}
+        />
+      </div>
+      
       {/* Main Content */}
       <main className="flex-1 overflow-auto">
         {/* Header */}
         <div className="sticky top-0 z-10 glass border-b border-border/50">
-          <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="max-w-full mx-auto px-6 py-4">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h1 className="sr-only">Contents</h1>
@@ -163,7 +167,7 @@ export default function Dashboard() {
 
             {/* Search and Filters */}
             <div className="flex items-center gap-2">
-              <div className="relative flex-1">
+              <div className="relative flex-grow min-w-0">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <input
                   type="text"
@@ -185,6 +189,7 @@ export default function Dashboard() {
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value as FilterStatus)}
                 className="input w-auto"
+                style={{ backgroundPosition: 'right 1rem center' }}
               >
                 <option value="all">All Status</option>
                 <option value="to_read">To Read</option>
@@ -196,7 +201,7 @@ export default function Dashboard() {
         </div>
 
         {/* Content Grid/List */}
-        <div className="max-w-7xl mx-auto px-6 py-6">
+        <div className={`${sidebarCollapsed ? 'max-w-full' : 'max-w-7xl'} mx-auto px-6 py-6`}>
           {loading ? (
             <div className="masonry-grid">
               {[...Array(6)].map((_, i) => (

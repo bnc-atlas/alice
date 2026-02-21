@@ -36,17 +36,22 @@ async function processCompleteMessageSet(chatId: string, urlMessage: {
     const url = urlParts[0]
     const urlTags = urlParts.filter((p: string) => p.startsWith('#')).map((p: string) => p.slice(1))
     const urlFolder = urlParts.find((p: string) => p.startsWith('@'))?.slice(1)
+    const urlDescriptionParts = urlParts.filter((p: string) => p.startsWith('*')).map((p: string) => p.slice(1))
+    const urlDescription = urlDescriptionParts.join(' ')
     
     // Parse tags message
     const tagsParts = tagsMessage.text?.split(' ') || []
     const tags = tagsParts.filter((p: string) => p.startsWith('#')).map((p: string) => p.slice(1))
     const folder = tagsParts.find((p: string) => p.startsWith('@'))?.slice(1)
+    const descriptionParts = tagsParts.filter((p: string) => p.startsWith('*')).map((p: string) => p.slice(1))
+    const description = descriptionParts.join(' ')
     
     // Combine tags and folders from both messages
     const allTags = [...new Set([...urlTags, ...tags])]
     const finalFolder = folder || urlFolder
+    const finalDescription = description || urlDescription
     
-    console.log('Processing complete set:', { url, allTags, finalFolder })
+    console.log('Processing complete set:', { url, allTags, finalFolder, finalDescription })
 
     // Fetch actual title from URL
     let title = 'New Content'
@@ -138,6 +143,7 @@ async function processCompleteMessageSet(chatId: string, urlMessage: {
         user_id: telegramUserUUID,
         title,
         url,
+        description: finalDescription,
         content_type: 'article',
         status: 'to_read',
         progress_percentage: 0,
@@ -195,6 +201,8 @@ async function processStandaloneUrlMessage(chatId: string, message: {
     const url = parts[0]
     const tags = parts.filter((p: string) => p.startsWith('#')).map((p: string) => p.slice(1))
     const folder = parts.find((p: string) => p.startsWith('@'))?.slice(1)
+    const descriptionParts = parts.filter((p: string) => p.startsWith('*')).map((p: string) => p.slice(1))
+    const finalDescription = descriptionParts.join(' ')
 
     const telegramUserUUID = '00000000-0000-0000-0000-000000000000'
 
@@ -288,6 +296,7 @@ async function processStandaloneUrlMessage(chatId: string, message: {
         user_id: telegramUserUUID,
         title,
         url,
+        description: finalDescription,
         content_type: 'article',
         status: 'to_read',
         progress_percentage: 0,
@@ -393,8 +402,17 @@ export async function POST(request: Request) {
       await sendTelegramMessage(chatId,
 `🧠 Welcome to Second Brain!
 
-Send me any URL with tags and folders:
-https://article.com #coding @curriculum
+Send me URLs with tags, folders, and descriptions:
+https://article.com #coding @curriculum *Great article about React hooks
+
+📝 Syntax:
+• #tag - Add tags
+• @folder - Add to folder
+• *description - Add description
+
+Examples:
+• https://article.com #ai #ml @research *Latest ML research
+• https://video.com #tutorial @learning *Great React course
 
 📊 Commands:
 /stats - Your statistics
@@ -450,7 +468,7 @@ https://article.com #coding @curriculum
         if (pending && (Date.now() - pending.timestamp >= 15000)) {
           console.log('Timeout: no URL found for tags message')
           pendingMessages.delete(`${chatId}_tags`)
-          sendTelegramMessage(chatId, '❓ I could not find a recent URL from you. Please send the article link first, then your #tags/@folder.')
+          sendTelegramMessage(chatId, '❓ I could not find a recent URL from you. Please send the article link first, then your #tags/@folder/*description.')
         }
       }, 15000)
       
